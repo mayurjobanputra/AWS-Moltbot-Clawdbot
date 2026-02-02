@@ -1,5 +1,5 @@
 # ===========================================
-# ClawdBot AWS Setup - .gitignore
+# OpenClaw AWS Setup - .gitignore
 # ===========================================
 
 # ===== CRITICAL: Never commit these! =====
@@ -19,16 +19,16 @@ id_ed25519
 # AWS credentials
 .aws/
 aws-credentials*
-clawdbot-key*
-clawdbot-instance.env
+openclaw-key*
+openclaw-instance.env
 
 # Environment files with secrets
 .env
 .env.*
 !.env.example
 
-# ClawdBot config with sensitive data
-.clawdbot/
+# OpenClaw config with sensitive data
+.openclaw/
 oauth.json
 auth-profiles.json
 gateway.auth.token

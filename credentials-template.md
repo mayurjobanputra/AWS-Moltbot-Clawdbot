@@ -17,7 +17,7 @@ This file is a **TEMPLATE** showing what credentials you'll need.
 | EC2 Instance ID | `i-xxxxxxxxxxxxxxxxx` | Starts with i- |
 | EC2 Public IP | `x.x.x.x` | Your instance public IP |
 | Security Group ID | `sg-xxxxxxxxxxxxxxxxx` | Starts with sg- |
-| Key Pair Name | `clawdbot-key` | Name only, not the file |
+| Key Pair Name | `openclaw-key` | Name only, not the file |
 
 ---
 
@@ -25,12 +25,12 @@ This file is a **TEMPLATE** showing what credentials you'll need.
 
 | Item | Value | Notes |
 |------|-------|-------|
-| PEM Key Location | `~/.ssh/clawdbot-key.pem` | Local path |
-| SSH Command | `ssh -i ~/.ssh/clawdbot-key.pem ec2-user@<IP>` | Replace IP |
+| PEM Key Location | `~/.ssh/openclaw-key.pem` | Local path |
+| SSH Command | `ssh -i ~/.ssh/openclaw-key.pem ec2-user@<IP>` | Replace IP |
 
 ---
 
-## ClawdBot
+## OpenClaw
 
 | Item | Value | Notes |
 |------|-------|-------|
@@ -79,7 +79,7 @@ openssl rand -hex 32
 curl -s ifconfig.me
 
 # Test SSH tunnel
-ssh -i ~/.ssh/clawdbot-key.pem -L 18789:localhost:18789 -N ec2-user@<IP>
+ssh -i ~/.ssh/openclaw-key.pem -L 18789:localhost:18789 -N ec2-user@<IP>
 ```
 
 ---

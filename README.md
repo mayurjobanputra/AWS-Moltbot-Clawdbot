@@ -1,9 +1,9 @@
-# 🦞 Clawdbot on AWS - Complete Setup Guide
+# 🦞 OpenClaw on AWS - Complete Setup Guide
 
-Run [Clawdbot](https://docs.clawd.bot/) (AI agent platform) on an AWS EC2 instance with **Claude, Gemini, GPT, or any LLM** - secured and production-ready.
+Run [OpenClaw](https://openclaw.ai/) (AI agent platform) on an AWS EC2 instance with **Claude, Gemini, GPT, or any LLM** - secured and production-ready.
 
 [![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazon-aws)](https://aws.amazon.com/ec2/)
-[![Clawdbot](https://img.shields.io/badge/Clawdbot-2026.x-blue)](https://docs.clawd.bot/)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-2026.x-blue)](https://openclaw.ai/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -12,7 +12,7 @@ Run [Clawdbot](https://docs.clawd.bot/) (AI agent platform) on an AWS EC2 instan
 
 **This guide is designed to be AI-readable.** You can:
 
-1. **Point any LLM at this guide** - Copy the contents of [`CLAWDBOT_AWS_SETUP.md`](CLAWDBOT_AWS_SETUP.md) into ChatGPT, Claude, Gemini, Grok, or any AI assistant and ask it to help you step-by-step.
+1. **Point any LLM at this guide** - Copy the contents of [`OpenClaw_AWS_Setup.md`](OpenClaw_AWS_Setup.md) into ChatGPT, Claude, Gemini, Grok, or any AI assistant and ask it to help you step-by-step.
 
 2. **Use VS Code + Roo Code** - Open this repo in VS Code with [Roo Code](https://roo.ai/) extension. It can read the guide and **execute terminal commands for you** automatically.
 
@@ -24,7 +24,7 @@ The guide is written to be both human-readable AND machine-parseable with clear 
 
 ## ✨ What You Get
 
-- 🦞 **Clawdbot Gateway** running 24/7 on your own VPS
+- 🦞 **OpenClaw Gateway** running 24/7 on your own VPS
 - 🔒 **Secure by default** - Localhost-only binding, SSH tunnel access
 - 💰 **Use your AWS credits** - Works with $1,000 AWS Activate program
 - 🧠 **Any LLM backend** - Claude (Bedrock), Gemini, GPT, Anthropic API, and more
@@ -40,26 +40,26 @@ The setup guide has **two parts**:
 
 | Part | What You Get | Time |
 |------|--------------|------|
-| **Part 1: Core Setup** | Private Clawdbot server, secure SSH access, web chat | ~30-60 min |
+| **Part 1: Core Setup** | Private OpenClaw server, secure SSH access, web chat | ~30-60 min |
 | **Part 2: Digital Twin** | Email, GitHub, X accounts for autonomous AI | ~2-3 hours |
 
 ### Part 1 is all you need to start!
 
-After Part 1, you can chat with Clawdbot via:
+After Part 1, you can chat with OpenClaw via:
 - ✅ SSH tunnel + built-in web chat
-- ✅ CLI (`clawdbot chat` over SSH)
+- ✅ CLI (`openclaw chat` over SSH)
 - ✅ VS Code + Roo Code extension
 - ✅ Tailscale VPN (optional)
 
 ### Part 2 adds external communication
 
-If you want Clawdbot to:
+If you want OpenClaw to:
 - 📧 Send/receive email
 - 🐙 Push to GitHub repos
 - 🐦 Post to X/Twitter
 - 🌐 Maintain a public website
 
-Then follow Part 2 to give Clawdbot its own identity.
+Then follow Part 2 to give OpenClaw its own identity.
 
 ### 🔐 Channel Security
 
@@ -82,20 +82,20 @@ Then follow Part 2 to give Clawdbot its own identity.
 
 ```bash
 # 1. Clone this repo
-git clone https://github.com/mayurjobanputra/AWS-Moltbot-Clawdbot.git
-cd AWS-Moltbot-Clawdbot
+git clone https://github.com/mayurjobanputra/OpenClaw-on-AWS.git
+cd OpenClaw-on-AWS
 
 # 2. Copy credentials template
 cp credentials-template.md credentials.md
 
 # 3. Follow the main guide
-# Open CLAWDBOT_AWS_SETUP.md and follow step by step
+# Open OPENCLAW_AWS_SETUP.md and follow step by step
 ```
 
 ### Or let AI do it for you:
 ```
-"Hey Claude/GPT/Gemini, I want to set up Clawdbot on AWS. 
-Here's a guide: [paste CLAWDBOT_AWS_SETUP.md contents]
+"Hey Claude/GPT/Gemini, I want to set up OpenClaw on AWS. 
+Here's a guide: [paste OPENCLAW_AWS_SETUP.md contents]
 Help me go through it step by step."
 ```
 
@@ -105,7 +105,7 @@ Help me go through it step by step."
 
 | File | Description |
 |------|-------------|
-| [`CLAWDBOT_AWS_SETUP.md`](CLAWDBOT_AWS_SETUP.md) | **Main guide** - Complete step-by-step instructions |
+| [`OpenClaw_AWS_Setup.md`](OpenClaw_AWS_Setup.md) | **Main guide** - Complete step-by-step instructions |
 | [`credentials-template.md`](credentials-template.md) | Template for tracking your credentials (safe to commit) |
 | `credentials.md` | Your actual credentials (gitignored - never commit!) |
 
@@ -166,10 +166,10 @@ Common issues and solutions are documented in the guide:
 
 - **"Unknown model" errors** → Use `models.providers` config (not just `agents.defaults`)
 - **"Missing auth" for Bedrock** → Create systemd drop-in file for AWS credentials
-- **Gateway won't start** → Check config validation with `clawdbot doctor --fix`
+- **Gateway won't start** → Check config validation with `openclaw doctor --fix`
 - **Can't SSH** → Verify security group rules and PEM permissions
 
-See the [Troubleshooting section](CLAWDBOT_AWS_SETUP.md#troubleshooting) in the main guide.
+See the [Troubleshooting section](OpenClaw_AWS_Setup.md#troubleshooting) in the main guide.
 
 ---
 
@@ -186,9 +186,10 @@ Found an issue or have an improvement? PRs welcome!
 
 ## 📚 Resources
 
-- [Clawdbot Documentation](https://docs.clawd.bot/)
+- [OpenClaw Website](https://openclaw.ai/)
+- [OpenClaw Documentation](https://docs.openclaw.ai/getting-started) - Getting started guide
 - [AWS Bedrock Docs](https://docs.aws.amazon.com/bedrock/)
-- [Crabwalk - Clawdbot Monitor](https://github.com/luccast/crabwalk)
+- [Crabwalk - OpenClaw Monitor](https://github.com/luccast/crabwalk)
 - [Memory Features Tip (X Post)](https://x.com/mayloidy/status/1884451877418135613) - Enable memory flush & session search
 - [Security Discussion (0xSammy)](https://x.com/0xSammy/status/2015562918151020593)
 - [Daniel Miessler's Security Checklist](https://x.com/DanielMiessler/status/2015865548714975475)
@@ -201,7 +202,7 @@ Found an issue or have an improvement? PRs welcome!
 ❌ .pem files (SSH keys)
 ❌ API keys  
 ❌ credentials.md
-❌ ~/.clawdbot/ contents
+❌ ~/.openclaw/ contents
 ❌ AWS access keys
 ```
 
@@ -221,13 +222,13 @@ MIT License - Use freely, contribute back!
 This repo was originally created for my personal AI assistant setup at mayur.ai:
 
 **My Project Goals:**
-1. ✅ Phase 1: Run Clawdbot on AWS VPS
+1. ✅ Phase 1: Run OpenClaw on AWS VPS
 2. ✅ Phase 2: Security lockdown
-3. ⏳ Phase 3: Clawdbot identity (SES email + GitHub account)
+3. ⏳ Phase 3: OpenClaw identity (SES email + GitHub account)
 4. ⏳ Phase 4: Public website on Vercel (separate from EC2)
 5. ⏳ Phase 5: Crabwalk monitoring
 
-**Architecture Decision:** Keep Clawdbot EC2 completely private. Public website hosted separately on Vercel. Clawdbot updates website via git push.
+**Architecture Decision:** Keep OpenClaw EC2 completely private. Public website hosted separately on Vercel. OpenClaw updates website via git push.
 
 </details>
 

@@ -1,7 +1,7 @@
-# ClawdBot AWS VPS Setup Guide
+# OpenClaw AWS VPS Setup Guide
 
 **Author:** AI-assisted setup documentation
-**Last Updated:** 2026-01-28
+**Last Updated:** 2026-01-30
 **Status:** Phases 1 & 2 Complete
 
 ---
@@ -12,28 +12,28 @@ This guide is divided into **two parts**:
 
 | Part | What You Get | Who Needs It |
 |------|--------------|--------------|
-| **Part 1: Core Setup** (Phases 0-2) | Private Clawdbot server on AWS, secure and working | Everyone |
+| **Part 1: Core Setup** (Phases 0-2) | Private OpenClaw server on AWS, secure and working | Everyone |
 | **Part 2: Digital Twin** (Phases 3-5) | Full autonomous AI with email, GitHub, social accounts | Those building a VA/digital twin |
 
-**After completing Part 1**, you have a fully functional Clawdbot accessible via:
+**After completing Part 1**, you have a fully functional OpenClaw accessible via:
 - ✅ SSH tunnel + Gateway web chat (built-in)
 - ✅ Private VPN like Tailscale (optional)
-- ✅ `clawdbot chat` CLI command
+- ✅ `openclaw chat` CLI command
 
-**Part 2 is optional** — it adds email, GitHub, X/Twitter accounts so Clawdbot can act autonomously and communicate externally.
+**Part 2 is optional** — it adds email, GitHub, X/Twitter accounts so OpenClaw can act autonomously and communicate externally.
 
 ---
 
 ## Table of Contents
 
-### Part 1: Core Clawdbot Setup (Required)
+### Part 1: Core OpenClaw Setup (Required)
 1. [Overview](#overview)
 2. [Phase 0: AWS Account Setup](#phase-0-aws-account-setup-before-you-begin)
 3. [Phase 1: AWS VPS Setup](#phase-1-aws-vps-setup)
 4. [Phase 2: Security Lockdown](#phase-2-security-lockdown)
 
 ### Part 2: Digital Twin / VA Setup (Optional)
-5. [Phase 3: Clawdbot Identity (Email + GitHub + X)](#phase-3-clawdbot-identity-email--github--x)
+5. [Phase 3: OpenClaw Identity (Email + GitHub + X)](#phase-3-openclaw-identity-email--github--x)
 6. [Phase 4: Public Website (Hosted Separately)](#phase-4-public-website-hosted-separately)
 7. [Phase 5: Crabwalk Integration](#phase-5-crabwalk-integration)
 
@@ -44,9 +44,9 @@ This guide is divided into **two parts**:
 
 ---
 
-# PART 1: CORE CLAWDBOT SETUP
+# PART 1: CORE OPENCLAW SETUP
 
-> **Goal:** Get Clawdbot running privately on AWS with secure access.
+> **Goal:** Get OpenClaw running privately on AWS with secure access.
 > **Time:** ~30-60 minutes
 > **Cost:** ~$19/month (or free with AWS Activate credits)
 
@@ -55,20 +55,20 @@ This guide is divided into **two parts**:
 ## Overview
 
 ### What Part 1 Gives You
-- ✅ Clawdbot running 24/7 on your own AWS server
+- ✅ OpenClaw running 24/7 on your own AWS server
 - ✅ Secure access via SSH tunnel (only you can connect)
 - ✅ Built-in web chat interface
-- ✅ CLI access (`clawdbot chat`)
+- ✅ CLI access (`openclaw chat`)
 - ✅ Your AWS Bedrock credits powering Claude models
 
-### How You'll Access Clawdbot
+### How You'll Access OpenClaw
 
 After Part 1, you have several access methods:
 
 | Method | Security | Setup |
 |--------|----------|-------|
-| **SSH tunnel + Web chat** | ✅ Excellent | Automatic with `ssh clawdbot` |
-| **CLI** (`ssh clawdbot`, then `clawdbot chat`) | ✅ Excellent | Built-in |
+| **SSH tunnel + Web chat** | ✅ Excellent | Automatic with `ssh openclaw` |
+| **CLI** (`ssh openclaw`, then `openclaw chat`) | ✅ Excellent | Built-in |
 | **Tailscale VPN** | ✅ Excellent | Optional, ~5 min setup |
 | **VS Code + Roo Code** | ✅ Excellent | Connect via SSH, AI in your editor |
 
@@ -76,7 +76,7 @@ After Part 1, you have several access methods:
 
 ### ⚠️ Important: Keep This Server Private
 
-**Do NOT run a public website on this EC2 instance.** The Clawdbot server should remain completely private for security reasons.
+**Do NOT run a public website on this EC2 instance.** The OpenClaw server should remain completely private for security reasons.
 
 If you want a public website, host it separately (Vercel, Netlify, etc.) — see Part 2.
 
@@ -89,7 +89,7 @@ If you want a public website, host it separately (Vercel, Netlify, etc.) — see
 │  │  PRIVATE EC2 (This Server)  │     │  PUBLIC (Vercel/Netlify/etc)    │    │
 │  │  ════════════════════════   │     │  ════════════════════════════   │    │
 │  │                             │     │                                 │    │
-│  │  🦞 Clawdbot Gateway        │     │  🌐 Your Website                │    │
+│  │  🦞 OpenClaw Gateway        │     │  🌐 Your Website                │    │
 │  │  • Full AI capabilities     │     │  • Public chatbot (stateless)   │    │
 │  │  • Shell access, tools      │     │  • Scheduling integration       │    │
 │  │  • Memory & workspace       │     │  • Contact forms                │    │
@@ -100,12 +100,12 @@ If you want a public website, host it separately (Vercel, Netlify, etc.) — see
 │  │  Port 18789: localhost      │     │                                 │    │
 │  └──────────────┬──────────────┘     └─────────────────────────────────┘    │
 │                 │                                                            │
-│                 │  Clawdbot updates website via:                             │
+│                 │  OpenClaw updates website via:                             │
 │                 │  • Git push (using its own GitHub account)                 │
 │                 │  • S3 sync                                                 │
 │                 ▼                                                            │
 │  ┌─────────────────────────────┐                                            │
-│  │  📧 Clawdbot's Identity     │                                            │
+│  │  📧 OpenClaw's Identity     │                                            │
 │  │  • Email: ai@yourdomain.com │                                            │
 │  │  • GitHub: yourdomain-ai    │                                            │
 │  │  • Can receive alerts       │                                            │
@@ -117,7 +117,7 @@ If you want a public website, host it separately (Vercel, Netlify, etc.) — see
 
 **Why separate systems?**
 
-| Concern | Private Clawdbot | Public Website |
+| Concern | Private OpenClaw | Public Website |
 |---------|------------------|----------------|
 | **Security** | Full tool access = high risk if exposed | Stateless = low risk |
 | **Attack surface** | SSH tunnel only | Standard web security |
@@ -126,7 +126,7 @@ If you want a public website, host it separately (Vercel, Netlify, etc.) — see
 
 ### ⚠️ CRITICAL SECURITY WARNING (from @0xSammy)
 
-> **923 ClawdBot gateways were found exposed with ZERO auth!**
+> **923 OpenClaw gateways were found exposed with ZERO auth!**
 > 
 > - Shell access, browser automation, API keys all exposed
 > - Anyone can connect to your IP and gain FULL control of your device
@@ -135,15 +135,15 @@ If you want a public website, host it separately (Vercel, Netlify, etc.) — see
 
 ---
 
-## 💡 How to Access ClawdBot Dashboard
+## 💡 How to Access OpenClaw Dashboard
 
-Since ClawdBot is bound to localhost for security, you need an SSH tunnel to access it.
+Since OpenClaw is bound to localhost for security, you need an SSH tunnel to access it.
 
 ### Quick Access (Recommended)
 
 ```bash
 # Start tunnel in background (keeps running even if terminal closes)
-ssh -L 18789:127.0.0.1:18789 -N clawdbot &
+ssh -L 18789:127.0.0.1:18789 -N openclaw &
 
 # Open dashboard
 open "http://localhost:18789/?token=YOUR_GATEWAY_TOKEN"
@@ -153,13 +153,13 @@ open "http://localhost:18789/?token=YOUR_GATEWAY_TOKEN"
 
 **Start tunnel (foreground - stays in terminal):**
 ```bash
-ssh clawdbot
+ssh openclaw
 # This also opens an interactive shell on EC2
 ```
 
 **Start tunnel (background - runs silently):**
 ```bash
-ssh -L 18789:127.0.0.1:18789 -N clawdbot &
+ssh -L 18789:127.0.0.1:18789 -N openclaw &
 ```
 
 **Check if tunnel is running:**
@@ -173,7 +173,7 @@ lsof -i :18789
 ```bash
 # If running in foreground: Ctrl+C
 # If running in background:
-pkill -f "ssh.*18789.*clawdbot"
+pkill -f "ssh.*18789.*openclaw"
 # Or find the PID and kill it:
 ps aux | grep "ssh.*18789" | grep -v grep
 kill <PID>
@@ -186,7 +186,7 @@ pkill -f "ssh.*18789"
 # Wait a moment
 sleep 2
 # Start fresh
-ssh -L 18789:127.0.0.1:18789 -N clawdbot &
+ssh -L 18789:127.0.0.1:18789 -N openclaw &
 ```
 
 ### Dashboard URL
@@ -197,7 +197,7 @@ http://localhost:18789/?token=YOUR_GATEWAY_TOKEN
 
 **Get your token** (on EC2):
 ```bash
-cat ~/.clawdbot/clawdbot.json | grep '"token"'
+cat ~/.openclaw/openclaw.json | grep '"token"'
 ```
 
 ---
@@ -219,7 +219,7 @@ If you don't have an AWS account yet:
 
 | Instance Type | RAM | Monthly Cost | Notes |
 |---------------|-----|--------------|-------|
-| `t2.micro` | 1GB | **Free** (Free Tier) | ⚠️ NOT enough for ClawdBot |
+| `t2.micro` | 1GB | **Free** (Free Tier) | ⚠️ NOT enough for OpenClaw |
 | `t2.small` | 2GB | ~$17/month | ✅ **Recommended minimum** |
 | `t3.small` | 2GB | ~$15/month | Slightly cheaper, burstable |
 | `t3.medium` | 4GB | ~$30/month | For heavy usage |
@@ -229,7 +229,7 @@ If you don't have an AWS account yet:
 - Elastic IP: Free when attached to running instance
 - EBS Storage (20GB): ~$1.60/month (30GB free in Free Tier)
 
-**⚠️ IMPORTANT:** ClawdBot needs ~600MB+ RAM. The `t2.micro` (1GB) will crash with out-of-memory errors. Use **t2.small (2GB)** minimum!
+**⚠️ IMPORTANT:** OpenClaw needs ~600MB+ RAM. The `t2.micro` (1GB) will crash with out-of-memory errors. Use **t2.small (2GB)** minimum!
 
 **💰 AWS Activate Credits:** If you have $1,000 in credits, a t2.small costs ~$17/month × 12 = ~$200/year, so your credits last **5+ years**!
 
@@ -243,7 +243,7 @@ If you're building a startup or project, apply for **AWS Activate**:
 - **$1,000 in AWS credits** (Founders tier)
 - Valid for 2 years
 - Works across ALL AWS services (EC2, S3, Lambda, etc.)
-- Great for running ClawdBot long-term without worrying about costs
+- Great for running OpenClaw long-term without worrying about costs
 
 **Requirements:**
 - Must be a new or early-stage startup
@@ -277,15 +277,15 @@ Run in **CloudShell**:
 ```bash
 # Create a key pair for SSH access
 aws ec2 create-key-pair \
-    --key-name clawdbot-key \
+    --key-name openclaw-key \
     --query 'KeyMaterial' \
-    --output text > clawdbot-key.pem
+    --output text > openclaw-key.pem
 
 # Set proper permissions
-chmod 400 clawdbot-key.pem
+chmod 400 openclaw-key.pem
 
 # Verify it was created (should show BEGIN RSA PRIVATE KEY)
-cat clawdbot-key.pem | head -3
+cat openclaw-key.pem | head -3
 ```
 
 - [ ] **CHECKPOINT:** Key pair created
@@ -299,8 +299,8 @@ echo "VPC ID: $VPC_ID"
 
 # Create security group
 SG_ID=$(aws ec2 create-security-group \
-    --group-name clawdbot-sg \
-    --description "Security group for ClawdBot VPS" \
+    --group-name openclaw-sg \
+    --description "Security group for OpenClaw VPS" \
     --vpc-id $VPC_ID \
     --query 'GroupId' \
     --output text)
@@ -332,7 +332,7 @@ aws ec2 describe-security-groups \
     --group-ids $SG_ID \
     --query 'SecurityGroups[0].IpPermissions'
 
-# NOTE: We are NOT opening port 18789 (ClawdBot gateway)
+# NOTE: We are NOT opening port 18789 (OpenClaw gateway)
 # This will ONLY be accessible via SSH tunnel
 ```
 
@@ -351,15 +351,15 @@ AMI_ID=$(aws ec2 describe-images \
     --output text)
 echo "AMI ID: $AMI_ID"
 
-# Launch instance with 20GB storage (default 8GB is NOT enough for ClawdBot!)
+# Launch instance with 20GB storage (default 8GB is NOT enough for OpenClaw!)
 INSTANCE_ID=$(aws ec2 run-instances \
     --image-id $AMI_ID \
     --count 1 \
     --instance-type t2.small \
-    --key-name clawdbot-key \
+    --key-name openclaw-key \
     --security-group-ids $SG_ID \
     --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":20,"VolumeType":"gp3"}}]' \
-    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ClawdBot-VPS}]' \
+    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=OpenClaw-VPS}]' \
     --query 'Instances[0].InstanceId' \
     --output text)
 echo "Instance ID: $INSTANCE_ID"
@@ -377,9 +377,9 @@ PUBLIC_IP=$(aws ec2 describe-instances \
 echo "🌐 Public IP: $PUBLIC_IP"
 
 # Save this info for later
-echo "INSTANCE_ID=$INSTANCE_ID" >> clawdbot-instance.env
-echo "PUBLIC_IP=$PUBLIC_IP" >> clawdbot-instance.env
-echo "SG_ID=$SG_ID" >> clawdbot-instance.env
+echo "INSTANCE_ID=$INSTANCE_ID" >> openclaw-instance.env
+echo "PUBLIC_IP=$PUBLIC_IP" >> openclaw-instance.env
+echo "SG_ID=$SG_ID" >> openclaw-instance.env
 ```
 
 - [ ] **CHECKPOINT:** EC2 instance launched with 20GB storage
@@ -403,7 +403,7 @@ aws ec2 associate-address --instance-id $INSTANCE_ID --allocation-id $ALLOC_ID
 echo "✅ Your PERMANENT IP is now: $EIP"
 
 # Update the saved IP
-echo "ELASTIC_IP=$EIP" >> clawdbot-instance.env
+echo "ELASTIC_IP=$EIP" >> openclaw-instance.env
 ```
 
 **Note:** Elastic IPs are free when attached to a running instance. They cost ~$0.005/hour (~$3.60/month) only if the instance is stopped or the IP is unattached.
@@ -414,7 +414,7 @@ echo "ELASTIC_IP=$EIP" >> clawdbot-instance.env
 
 In **CloudShell**, display the full key:
 ```bash
-cat clawdbot-key.pem
+cat openclaw-key.pem
 ```
 
 Copy the **entire output** (from `-----BEGIN RSA PRIVATE KEY-----` to `-----END RSA PRIVATE KEY-----`).
@@ -423,33 +423,33 @@ Copy the **entire output** (from `-----BEGIN RSA PRIVATE KEY-----` to `-----END 
 
 **Option A: Using VS Code (easiest)**
 ```bash
-code ~/.ssh/clawdbot-key.pem
+code ~/.ssh/openclaw-key.pem
 # Paste key content, save with Cmd+S
-chmod 400 ~/.ssh/clawdbot-key.pem
+chmod 400 ~/.ssh/openclaw-key.pem
 ```
 
 **Option B: Using cat with heredoc**
 ```bash
 mkdir -p ~/.ssh
-cat > ~/.ssh/clawdbot-key.pem << 'EOF'
+cat > ~/.ssh/openclaw-key.pem << 'EOF'
 -----BEGIN RSA PRIVATE KEY-----
 [PASTE YOUR KEY HERE]
 -----END RSA PRIVATE KEY-----
 EOF
-chmod 400 ~/.ssh/clawdbot-key.pem
+chmod 400 ~/.ssh/openclaw-key.pem
 ```
 
 **Option C: Using pbpaste (Mac only)**
 Copy the key to clipboard, then:
 ```bash
 mkdir -p ~/.ssh
-pbpaste > ~/.ssh/clawdbot-key.pem
-chmod 400 ~/.ssh/clawdbot-key.pem
+pbpaste > ~/.ssh/openclaw-key.pem
+chmod 400 ~/.ssh/openclaw-key.pem
 ```
 
 **Verify:**
 ```bash
-ls -la ~/.ssh/clawdbot-key.pem
+ls -la ~/.ssh/openclaw-key.pem
 # Should show: -r-------- (permissions 400)
 ```
 
@@ -460,7 +460,7 @@ ls -la ~/.ssh/clawdbot-key.pem
 From your **local terminal**:
 ```bash
 # Replace <ELASTIC_IP> with your Elastic IP from above
-ssh -i ~/.ssh/clawdbot-key.pem ec2-user@<ELASTIC_IP>
+ssh -i ~/.ssh/openclaw-key.pem ec2-user@<ELASTIC_IP>
 ```
 
 If prompted "Are you sure you want to continue connecting?", type `yes`.
@@ -476,7 +476,7 @@ Once SSH'd into the EC2 instance:
 # Update system
 sudo dnf update -y
 
-# Install Node.js 22 (ClawdBot requires Node >= 22)
+# Install Node.js 22 (OpenClaw requires Node >= 22)
 curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
 sudo dnf install -y nodejs
 
@@ -487,27 +487,27 @@ npm --version
 
 - [ ] **CHECKPOINT:** Node.js 22+ installed
 
-### Step 1.8: Install ClawdBot
+### Step 1.8: Install OpenClaw
 
 ```bash
-# Install ClawdBot CLI
-curl -fsSL https://clawd.bot/install.sh | bash
+# Install OpenClaw CLI
+curl -fsSL https://openclaw.ai/install.sh | bash
 
 # If install fails due to space, clean up first:
 # npm cache clean --force
 # rm -rf ~/.npm/_cacache
 
 # Verify installation
-clawdbot --version
+openclaw --version
 ```
 
-- [ ] **CHECKPOINT:** ClawdBot installed
+- [ ] **CHECKPOINT:** OpenClaw installed
 
-### Step 1.9: Run ClawdBot Onboarding
+### Step 1.9: Run OpenClaw Onboarding
 
 ```bash
 # Run the onboarding wizard
-clawdbot onboard --install-daemon
+openclaw onboard --install-daemon
 ```
 
 **During onboarding, choose these options:**
@@ -528,26 +528,26 @@ clawdbot onboard --install-daemon
 - Gateway auth: Token (default)
 - Tailscale: Off
 
-- [ ] **CHECKPOINT:** ClawdBot onboarding completed
+- [ ] **CHECKPOINT:** OpenClaw onboarding completed
 
 ### Step 1.10: Start and Verify Gateway
 
 ```bash
 # Start the gateway service
-systemctl --user start clawdbot-gateway
+systemctl --user start openclaw-gateway
 
 # Enable auto-start on boot
-systemctl --user enable clawdbot-gateway
+systemctl --user enable openclaw-gateway
 
 # Check status
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 
 # Check gateway health
-clawdbot gateway status
-clawdbot health
+openclaw gateway status
+openclaw health
 ```
 
-- [ ] **CHECKPOINT:** ClawdBot gateway is running
+- [ ] **CHECKPOINT:** OpenClaw gateway is running
 
 ### Step 1.11: Configure AI Provider (AWS Bedrock)
 
@@ -579,8 +579,8 @@ You have two options for AI models. We'll use **AWS Bedrock** since you have an 
 In **CloudShell**, run:
 
 ```bash
-# Create a dedicated IAM user for ClawdBot
-aws iam create-user --user-name clawdbot-bedrock
+# Create a dedicated IAM user for OpenClaw
+aws iam create-user --user-name openclaw-bedrock
 
 # Create access policy for Bedrock
 cat > /tmp/bedrock-policy.json << 'EOF'
@@ -601,7 +601,7 @@ EOF
 
 # Create the policy
 aws iam create-policy \
-    --policy-name ClawdBotBedrockAccess \
+    --policy-name OpenClawBedrockAccess \
     --policy-document file:///tmp/bedrock-policy.json
 
 # Get your AWS account ID
@@ -610,11 +610,11 @@ echo "Account ID: $ACCOUNT_ID"
 
 # Attach policy to user
 aws iam attach-user-policy \
-    --user-name clawdbot-bedrock \
-    --policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/ClawdBotBedrockAccess
+    --user-name openclaw-bedrock \
+    --policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/OpenClawBedrockAccess
 
 # Create access keys
-aws iam create-access-key --user-name clawdbot-bedrock
+aws iam create-access-key --user-name openclaw-bedrock
 
 # ⚠️ SAVE THE OUTPUT! You'll need:
 # - AccessKeyId
@@ -629,13 +629,13 @@ aws iam create-access-key --user-name clawdbot-bedrock
 
 SSH into your EC2 instance:
 ```bash
-ssh clawdbot
+ssh openclaw
 ```
 
 **Option A: AWS Credentials File (for CLI testing)**
 
 ```bash
-# Set up AWS credentials for ClawdBot
+# Set up AWS credentials for OpenClaw
 mkdir -p ~/.aws
 
 cat > ~/.aws/credentials << 'EOF'
@@ -660,24 +660,24 @@ aws bedrock list-foundation-models --query 'modelSummaries[?contains(modelId, `a
 
 You should see a list of Anthropic models - that means it's working!
 
-> ⚠️ **CRITICAL: Clawdbot Systemd Service Issue**
+> ⚠️ **CRITICAL: OpenClaw Systemd Service Issue**
 >
-> The AWS credentials file works for CLI commands, but **Clawdbot runs as a systemd service** which does NOT inherit your shell environment or read `~/.aws/credentials` automatically.
+> The AWS credentials file works for CLI commands, but **OpenClaw runs as a systemd service** which does NOT inherit your shell environment or read `~/.aws/credentials` automatically.
 >
-> You MUST also complete **Option B** below for Clawdbot to access Bedrock!
+> You MUST also complete **Option B** below for OpenClaw to access Bedrock!
 
-**Option B: Systemd Drop-in Configuration (REQUIRED for Clawdbot)**
+**Option B: Systemd Drop-in Configuration (REQUIRED for OpenClaw)**
 
-Clawdbot only supports Amazon Bedrock via the **AWS SDK default credential chain** (environment variables, shared config, instance roles). The systemd service runs in isolation and won't see your shell credentials.
+OpenClaw only supports Amazon Bedrock via the **AWS SDK default credential chain** (environment variables, shared config, instance roles). The systemd service runs in isolation and won't see your shell credentials.
 
 Create a systemd drop-in file to inject AWS credentials into the service:
 
 ```bash
 # Create drop-in directory
-mkdir -p ~/.config/systemd/user/clawdbot-gateway.service.d
+mkdir -p ~/.config/systemd/user/openclaw-gateway.service.d
 
 # Create environment file (replace with YOUR keys)
-cat > ~/.config/systemd/user/clawdbot-gateway.service.d/aws.conf << 'EOF'
+cat > ~/.config/systemd/user/openclaw-gateway.service.d/aws.conf << 'EOF'
 [Service]
 Environment="AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY_ID_HERE"
 Environment="AWS_SECRET_ACCESS_KEY=YOUR_SECRET_ACCESS_KEY_HERE"
@@ -685,37 +685,37 @@ Environment="AWS_REGION=us-east-1"
 EOF
 
 # Set secure permissions
-chmod 600 ~/.config/systemd/user/clawdbot-gateway.service.d/aws.conf
+chmod 600 ~/.config/systemd/user/openclaw-gateway.service.d/aws.conf
 
 # Reload systemd to pick up changes
 systemctl --user daemon-reload
 
 # Restart gateway
-systemctl --user restart clawdbot-gateway
+systemctl --user restart openclaw-gateway
 ```
 
 **Verify the drop-in is loaded:**
 ```bash
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 # Look for "Drop-In:" section showing aws.conf
 ```
 
 - [ ] **CHECKPOINT:** AWS credentials configured on EC2 (both file AND systemd)
 
-#### Step 1.11.4: Configure ClawdBot for Bedrock
+#### Step 1.11.4: Configure OpenClaw for Bedrock
 
 > ⚠️ **CRITICAL: Use `models.providers` configuration!**
 >
-> The `clawdbot configure` commands may not work for newer models. You MUST add the model definition under `models.providers` in `clawdbot.json` for cross-region inference profiles to work.
+> The `openclaw configure` commands may not work for newer models. You MUST add the model definition under `models.providers` in `openclaw.json` for cross-region inference profiles to work.
 
-**Edit `~/.clawdbot/clawdbot.json` and add the `models.providers` section:**
+**Edit `~/.openclaw/openclaw.json` and add the `models.providers` section:**
 
 ```bash
 # Install nano if not available
 sudo dnf install nano -y
 
 # Edit the config file
-nano ~/.clawdbot/clawdbot.json
+nano ~/.openclaw/openclaw.json
 ```
 
 Add this `models` section (merge with existing config):
@@ -773,10 +773,10 @@ Add this `models` section (merge with existing config):
 
 **Restart the gateway:**
 ```bash
-systemctl --user restart clawdbot-gateway
+systemctl --user restart openclaw-gateway
 
 # Verify the model is recognized
-clawdbot models list | grep -i claude
+openclaw models list | grep -i claude
 ```
 
 **Available Bedrock Claude Model IDs:**
@@ -801,7 +801,7 @@ clawdbot models list | grep -i claude
 | Claude 3 Sonnet | `anthropic.claude-3-sonnet-20240229-v1:0` | Works without prefix ✅ |
 | Claude 3 Opus | `anthropic.claude-3-opus-20240229-v1:0` | Works without prefix ✅ |
 
-**Recommended for ClawdBot:**
+**Recommended for OpenClaw:**
 ```bash
 # Best balance of capability and cost
 us.anthropic.claude-sonnet-4-5-20250929-v1:0
@@ -813,16 +813,16 @@ us.anthropic.claude-opus-4-5-20251101-v1:0
 us.anthropic.claude-3-5-haiku-20241022-v1:0
 ```
 
-- [ ] **CHECKPOINT:** ClawdBot configured for AWS Bedrock
+- [ ] **CHECKPOINT:** OpenClaw configured for AWS Bedrock
 
 #### Step 1.11.5: Test the Configuration
 
 ```bash
-# Test that ClawdBot can reach Bedrock
-clawdbot health
+# Test that OpenClaw can reach Bedrock
+openclaw health
 
 # Start a test conversation (from EC2)
-clawdbot chat "Hello, can you confirm you're running via AWS Bedrock?"
+openclaw chat "Hello, can you confirm you're running via AWS Bedrock?"
 ```
 
 Then from your **local machine** with the SSH tunnel:
@@ -836,14 +836,14 @@ Then from your **local machine** with the SSH tunnel:
 
 > 💡 **Source:** [Memory Features Tip (X Post)](https://x.com/mayloidy/status/1884451877418135613) - Community discovery of these hidden defaults
 
-By default, ClawdBot's two best memory features are **turned OFF**. Enabling them dramatically improves context retention across sessions and compactions.
+By default, OpenClaw's two best memory features are **turned OFF**. Enabling them dramatically improves context retention across sessions and compactions.
 
 #### What These Features Do
 
 | Feature | Setting | Problem It Solves |
 |---------|---------|-------------------|
-| **Memory Flush** | `compaction.memoryFlush.enabled: true` | When context gets too large, ClawdBot "compacts" it (summarizes old messages). Without memory flush, important details get lost. With it enabled, everything important is automatically saved to memory files RIGHT BEFORE compaction. |
-| **Session Memory Search** | `memorySearch.experimental.sessionMemory: true` | Normally ClawdBot can only search your `MEMORY.md` file. With session memory search, it can search through **every conversation** you've ever had, even ones it no longer "remembers." |
+| **Memory Flush** | `compaction.memoryFlush.enabled: true` | When context gets too large, OpenClaw "compacts" it (summarizes old messages). Without memory flush, important details get lost. With it enabled, everything important is automatically saved to memory files RIGHT BEFORE compaction. |
+| **Session Memory Search** | `memorySearch.experimental.sessionMemory: true` | Normally OpenClaw can only search your `MEMORY.md` file. With session memory search, it can search through **every conversation** you've ever had, even ones it no longer "remembers." |
 
 #### Why Enable These?
 
@@ -856,9 +856,9 @@ By default, ClawdBot's two best memory features are **turned OFF**. Enabling the
 
 **Option A: Via Gateway API** (if gateway is running with tools):
 
-Ask ClawdBot:
+Ask OpenClaw:
 ```
-Enable memory flush before compaction and session memory search in my Clawdbot config.
+Enable memory flush before compaction and session memory search in my OpenClaw config.
 Set compaction.memoryFlush.enabled to true and set memorySearch.experimental.sessionMemory
 to true with sources including both memory and sessions. Apply the config changes.
 ```
@@ -867,7 +867,7 @@ to true with sources including both memory and sessions. Apply the config change
 
 ```bash
 # Edit the config file
-nano ~/.clawdbot/clawdbot.json
+nano ~/.openclaw/openclaw.json
 ```
 
 Add/update these sections in your `agents.defaults`:
@@ -895,15 +895,15 @@ Add/update these sections in your `agents.defaults`:
 
 **Restart the gateway:**
 ```bash
-systemctl --user restart clawdbot-gateway
+systemctl --user restart openclaw-gateway
 ```
 
 #### Verify Configuration
 
 ```bash
 # Check the config shows the new settings
-cat ~/.clawdbot/clawdbot.json | grep -A5 "memoryFlush"
-cat ~/.clawdbot/clawdbot.json | grep -A5 "memorySearch"
+cat ~/.openclaw/openclaw.json | grep -A5 "memoryFlush"
+cat ~/.openclaw/openclaw.json | grep -A5 "memorySearch"
 ```
 
 Expected output should show:
@@ -922,9 +922,9 @@ If you prefer to use Anthropic directly (requires separate API key from [console
 
 ```bash
 # On EC2:
-clawdbot configure --section auth --set provider=anthropic
-clawdbot configure --section auth --set anthropic.apiKey=sk-ant-api03-xxxxx
-systemctl --user restart clawdbot-gateway
+openclaw configure --section auth --set provider=anthropic
+openclaw configure --section auth --set anthropic.apiKey=sk-ant-api03-xxxxx
+systemctl --user restart openclaw-gateway
 ```
 
 - [ ] **CHECKPOINT:** AI provider configured (Bedrock OR Anthropic)
@@ -939,14 +939,14 @@ systemctl --user restart clawdbot-gateway
 
 ```bash
 # Run security audit
-clawdbot security audit --deep
+openclaw security audit --deep
 
 # Check the gateway configuration
-clawdbot configure --section gateway
+openclaw configure --section gateway
 
 # If bind is NOT "loopback", IMMEDIATELY fix it:
-clawdbot configure --section gateway --set bind=loopback
-systemctl --user restart clawdbot-gateway
+openclaw configure --section gateway --set bind=loopback
+systemctl --user restart openclaw-gateway
 ```
 
 - [ ] **CHECKPOINT:** Gateway bind = loopback
@@ -973,12 +973,12 @@ nc -zv 127.0.0.1 18789
 
 - [ ] **CHECKPOINT:** Port 18789 not externally accessible
 
-### Step 2.3: Set Up SSH Tunnel for ClawdBot Access
+### Step 2.3: Set Up SSH Tunnel for OpenClaw Access
 
 From your **local machine**:
 ```bash
 # This forwards local port 18789 to the EC2's localhost:18789
-ssh -i ~/.ssh/clawdbot-key.pem -L 18789:127.0.0.1:18789 -N ec2-user@<ELASTIC_IP>
+ssh -i ~/.ssh/openclaw-key.pem -L 18789:127.0.0.1:18789 -N ec2-user@<ELASTIC_IP>
 ```
 
 Now open in your browser:
@@ -988,7 +988,7 @@ http://localhost:18789/?token=YOUR_GATEWAY_TOKEN
 
 **Get your token** (on EC2):
 ```bash
-cat ~/.clawdbot/clawdbot.json | grep -A2 '"auth"'
+cat ~/.openclaw/openclaw.json | grep -A2 '"auth"'
 # Or check onboarding output for the tokenized URL
 ```
 
@@ -1004,7 +1004,7 @@ curl -s ifconfig.me
 In **CloudShell**:
 ```bash
 # Load saved environment
-source clawdbot-instance.env
+source openclaw-instance.env
 
 YOUR_IP="<YOUR_PUBLIC_IP_HERE>"
 
@@ -1033,16 +1033,16 @@ echo "✅ SSH now restricted to $YOUR_IP"
 
 On your **local machine**, add to `~/.ssh/config`:
 ```
-Host clawdbot
+Host openclaw
     HostName <ELASTIC_IP>
     User ec2-user
-    IdentityFile ~/.ssh/clawdbot-key.pem
+    IdentityFile ~/.ssh/openclaw-key.pem
     LocalForward 18789 127.0.0.1:18789
 ```
 
 Now you can connect with just:
 ```bash
-ssh clawdbot
+ssh openclaw
 # This also sets up the tunnel automatically!
 ```
 
@@ -1072,30 +1072,30 @@ nmap -Pn <ELASTIC_IP>
 
 ### Step 2.7: Advanced Security Hardening (Daniel Miessler Checklist)
 
-Based on the [CLAWDBOT Security Hardening](https://x.com/DanielMiessler/status/2015865548714975475) checklist, implement these additional security measures:
+Based on the [OpenClaw Security Hardening](https://x.com/DanielMiessler/status/2015865548714975475) checklist, implement these additional security measures:
 
 #### 2.7.1: Verify/Set Gateway Auth Token
 
 ```bash
 # On EC2: View current config
-cat ~/.clawdbot/clawdbot.json
+cat ~/.openclaw/openclaw.json
 
 # Generate a strong random token
 TOKEN=$(openssl rand -hex 32)
 echo "Your new token: $TOKEN"
 
 # Backup config first
-cp ~/.clawdbot/clawdbot.json ~/.clawdbot/clawdbot.json.bak
+cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak
 
 # Edit config to update/add the token in the gateway.auth section
-nano ~/.clawdbot/clawdbot.json
+nano ~/.openclaw/openclaw.json
 # Find "auth" section under gateway and set: "token": "YOUR_TOKEN_HERE"
 
 # Or use jq if installed:
-# jq --arg token "$TOKEN" '.gateway.auth.token = $token' ~/.clawdbot/clawdbot.json > tmp.json && mv tmp.json ~/.clawdbot/clawdbot.json
+# jq --arg token "$TOKEN" '.gateway.auth.token = $token' ~/.openclaw/openclaw.json > tmp.json && mv tmp.json ~/.openclaw/openclaw.json
 
 # Restart gateway after changes
-systemctl --user restart clawdbot-gateway
+systemctl --user restart openclaw-gateway
 ```
 
 - [ ] **CHECKPOINT:** Gateway auth token is cryptographic random
@@ -1104,14 +1104,14 @@ systemctl --user restart clawdbot-gateway
 
 ```bash
 # On EC2: Check current DM policy
-clawdbot configure --section permissions
+openclaw configure --section permissions
 
 # Set to allowlist mode with explicit users
-clawdbot configure --section permissions --set dm_policy=allowlist
-clawdbot configure --section permissions --set allowed_users='["your-user-id"]'
+openclaw configure --section permissions --set dm_policy=allowlist
+openclaw configure --section permissions --set allowed_users='["your-user-id"]'
 
 # Verify
-clawdbot configure --section permissions
+openclaw configure --section permissions
 ```
 
 - [ ] **CHECKPOINT:** DM policy set to allowlist
@@ -1120,13 +1120,13 @@ clawdbot configure --section permissions
 
 ```bash
 # On EC2: Enable sandbox for all operations
-clawdbot configure --section security --set sandbox=all
+openclaw configure --section security --set sandbox=all
 
 # If using Docker, add network isolation:
-# clawdbot configure --section security --set docker.network=none
+# openclaw configure --section security --set docker.network=none
 
 # Verify sandbox status
-clawdbot security audit --deep
+openclaw security audit --deep
 ```
 
 - [ ] **CHECKPOINT:** Sandbox enabled
@@ -1135,24 +1135,24 @@ clawdbot security audit --deep
 
 ```bash
 # On EC2: Check file permissions on config files
-ls -la ~/.clawdbot/
+ls -la ~/.openclaw/
 
 # Set restrictive permissions
-chmod 600 ~/.clawdbot/clawdbot.json
-chmod 600 ~/.clawdbot/*.json
+chmod 600 ~/.openclaw/openclaw.json
+chmod 600 ~/.openclaw/*.json
 
 # Move sensitive credentials to environment variables
 # Edit your shell profile:
 cat >> ~/.bashrc << 'EOF'
-# ClawdBot credentials (never commit to git!)
+# OpenClaw credentials (never commit to git!)
 export ANTHROPIC_API_KEY="your-key-here"
 EOF
 
-# Update clawdbot to use env var instead of file
-clawdbot configure --section auth --set anthropic.apiKey='${ANTHROPIC_API_KEY}'
+# Update openclaw to use env var instead of file
+openclaw configure --section auth --set anthropic.apiKey='${ANTHROPIC_API_KEY}'
 
 # Verify no plaintext credentials
-grep -r "sk-" ~/.clawdbot/ 2>/dev/null && echo "⚠️ Plaintext keys found!" || echo "✅ No plaintext keys"
+grep -r "sk-" ~/.openclaw/ 2>/dev/null && echo "⚠️ Plaintext keys found!" || echo "✅ No plaintext keys"
 ```
 
 - [ ] **CHECKPOINT:** Credentials secured (env vars + chmod 600)
@@ -1161,7 +1161,7 @@ grep -r "sk-" ~/.clawdbot/ 2>/dev/null && echo "⚠️ Plaintext keys found!" ||
 
 ```bash
 # On EC2: Add command blocklist
-clawdbot configure --section security --set blocked_commands='[
+openclaw configure --section security --set blocked_commands='[
   "rm -rf /",
   "rm -rf ~",
   "rm -rf /*",
@@ -1175,7 +1175,7 @@ clawdbot configure --section security --set blocked_commands='[
 ]'
 
 # Verify blocklist
-clawdbot configure --section security
+openclaw configure --section security
 ```
 
 - [ ] **CHECKPOINT:** Dangerous commands blocked
@@ -1184,14 +1184,14 @@ clawdbot configure --section security
 
 ```bash
 # On EC2: Review currently enabled tools/skills
-clawdbot configure --section skills
+openclaw configure --section skills
 
 # Disable any tools you don't need:
-# clawdbot configure --section skills --set browser=false
-# clawdbot configure --section skills --set filesystem=restricted
+# openclaw configure --section skills --set browser=false
+# openclaw configure --section skills --set filesystem=restricted
 
 # For MCP servers, only enable what's necessary
-clawdbot mcp list
+openclaw mcp list
 # Disable unused MCP servers
 ```
 
@@ -1201,13 +1201,13 @@ clawdbot mcp list
 
 ```bash
 # On EC2: Enable detailed logging
-clawdbot configure --section logging --set level=verbose
-clawdbot configure --section logging --set audit=true
-clawdbot configure --section logging --set log_file=~/.clawdbot/audit.log
+openclaw configure --section logging --set level=verbose
+openclaw configure --section logging --set audit=true
+openclaw configure --section logging --set log_file=~/.openclaw/audit.log
 
 # Set up log rotation
-sudo tee /etc/logrotate.d/clawdbot << 'EOF'
-/home/ec2-user/.clawdbot/audit.log {
+sudo tee /etc/logrotate.d/openclaw << 'EOF'
+/home/ec2-user/.openclaw/audit.log {
     daily
     rotate 30
     compress
@@ -1217,14 +1217,14 @@ sudo tee /etc/logrotate.d/clawdbot << 'EOF'
 EOF
 
 # Verify logging is working
-tail -f ~/.clawdbot/audit.log
+tail -f ~/.openclaw/audit.log
 ```
 
 - [ ] **CHECKPOINT:** Audit logging enabled
 
 #### 2.7.8: Network Isolation (Docker Option)
 
-For maximum isolation, run ClawdBot in Docker with network restrictions:
+For maximum isolation, run OpenClaw in Docker with network restrictions:
 
 ```bash
 # On EC2: Create isolated Docker network (optional advanced setup)
@@ -1233,7 +1233,7 @@ For maximum isolation, run ClawdBot in Docker with network restrictions:
 # sudo systemctl enable docker
 
 # Run with no external network access:
-# docker run --network=none -v ~/.clawdbot:/root/.clawdbot clawdbot/gateway
+# docker run --network=none -v ~/.openclaw:/root/.openclaw openclaw/gateway
 ```
 
 **Note:** This is optional for advanced users. The loopback binding + SSH tunnel already provides strong isolation.
@@ -1244,19 +1244,19 @@ For maximum isolation, run ClawdBot in Docker with network restrictions:
 
 | Fix | Command to Verify | Expected Result |
 |-----|-------------------|-----------------|
-| Auth token | `clawdbot configure --section gateway` | Token should be 32+ hex chars |
-| DM policy | `clawdbot configure --section permissions` | `dm_policy: allowlist` |
-| Sandbox | `clawdbot security audit --deep` | Sandbox: enabled |
-| Credentials | `ls -la ~/.clawdbot/*.json` | `-rw-------` (600 perms) |
-| Commands | `clawdbot configure --section security` | Blocklist populated |
-| MCP tools | `clawdbot mcp list` | Only needed tools enabled |
-| Logging | `tail ~/.clawdbot/audit.log` | Logs appearing |
+| Auth token | `openclaw configure --section gateway` | Token should be 32+ hex chars |
+| DM policy | `openclaw configure --section permissions` | `dm_policy: allowlist` |
+| Sandbox | `openclaw security audit --deep` | Sandbox: enabled |
+| Credentials | `ls -la ~/.openclaw/*.json` | `-rw-------` (600 perms) |
+| Commands | `openclaw configure --section security` | Blocklist populated |
+| MCP tools | `openclaw mcp list` | Only needed tools enabled |
+| Logging | `tail ~/.openclaw/audit.log` | Logs appearing |
 
 ---
 
 # PART 2: DIGITAL TWIN / VA SETUP
 
-> **Goal:** Give Clawdbot its own identity to act autonomously — email, GitHub, social media.
+> **Goal:** Give OpenClaw its own identity to act autonomously — email, GitHub, social media.
 > **Who needs this:** Those building a personal AI assistant / digital twin.
 > **Prerequisites:** Complete Part 1 first.
 
@@ -1280,9 +1280,9 @@ Before setting up external channels, understand the security tradeoffs:
 
 ---
 
-## Phase 3: Clawdbot Identity (Email + GitHub + X)
+## Phase 3: OpenClaw Identity (Email + GitHub + X)
 
-For Clawdbot to autonomously manage repos, post to social media, receive notifications, and act as your digital twin, it needs its own identity.
+For OpenClaw to autonomously manage repos, post to social media, receive notifications, and act as your digital twin, it needs its own identity.
 
 ### The Identity Chain
 
@@ -1294,7 +1294,7 @@ Email (ai@yourdomain.com)          ← Foundation (required first)
     └── Other services             ← As needed (sign up with email)
 ```
 
-### Why Give Clawdbot Its Own Identity?
+### Why Give OpenClaw Its Own Identity?
 
 | Capability | Requires |
 |------------|----------|
@@ -1307,8 +1307,8 @@ Email (ai@yourdomain.com)          ← Foundation (required first)
 ### Step 3.1: Set Up AWS WorkMail (CloudShell Commands)
 
 **Why WorkMail?**
-- ✅ Full mailbox with IMAP (Clawdbot reads inbox via CLI)
-- ✅ Built-in SMTP (Clawdbot sends emails)
+- ✅ Full mailbox with IMAP (OpenClaw reads inbox via CLI)
+- ✅ Built-in SMTP (OpenClaw sends emails)
 - ✅ Web UI (you can log in and review anytime)
 - ✅ Uses your AWS credits
 - ✅ Calendar & contacts included
@@ -1336,8 +1336,8 @@ ORG_ID=$(aws workmail list-organizations --region us-east-1 \
 echo "Organization ID: $ORG_ID"
 
 # Save for later steps
-echo "ORG_ID=$ORG_ID" >> clawdbot-instance.env
-echo "ORG_ALIAS=$ORG_ALIAS" >> clawdbot-instance.env
+echo "ORG_ID=$ORG_ID" >> openclaw-instance.env
+echo "ORG_ALIAS=$ORG_ALIAS" >> openclaw-instance.env
 ```
 
 - [ ] **CHECKPOINT:** WorkMail organization created
@@ -1348,7 +1348,7 @@ echo "ORG_ALIAS=$ORG_ALIAS" >> clawdbot-instance.env
 
 ```bash
 # Load saved ORG_ID
-source clawdbot-instance.env
+source openclaw-instance.env
 
 # Replace with YOUR domain
 DOMAIN="yourdomain.com"
@@ -1371,7 +1371,7 @@ aws workmail list-mail-domains \
     --region us-east-1
 
 # Save domain for later
-echo "DOMAIN=$DOMAIN" >> clawdbot-instance.env
+echo "DOMAIN=$DOMAIN" >> openclaw-instance.env
 ```
 
 **⚠️ PAUSE HERE** - Add DNS records to your domain before proceeding.
@@ -1407,11 +1407,11 @@ aws workmail list-mail-domains \
 - [ ] **CHECKPOINT:** DNS records added to your domain
 - [ ] **CHECKPOINT:** Domain verified in WorkMail
 
-#### Step 3.1.3: Create Clawdbot Mailbox (CloudShell)
+#### Step 3.1.3: Create OpenClaw Mailbox (CloudShell)
 
 ```bash
 # Load saved variables
-source clawdbot-instance.env
+source openclaw-instance.env
 
 # Set your desired username and display name
 EMAIL_USER="ai"                        # Creates ai@yourdomain.com
@@ -1443,17 +1443,17 @@ aws workmail register-to-work-mail \
 echo "✅ Mailbox created: $EMAIL_ADDRESS"
 
 # Save for reference
-echo "EMAIL_ADDRESS=$EMAIL_ADDRESS" >> clawdbot-instance.env
+echo "EMAIL_ADDRESS=$EMAIL_ADDRESS" >> openclaw-instance.env
 ```
 
-- [ ] **CHECKPOINT:** Clawdbot mailbox created
+- [ ] **CHECKPOINT:** OpenClaw mailbox created
 
 #### Step 3.1.4: Connection Details
 
 After completing the steps above, your connection details are:
 
 ```
-=== Clawdbot Email Credentials ===
+=== OpenClaw Email Credentials ===
 Email: ai@yourdomain.com (or whatever you configured)
 Password: (what you set in Step 3.1.3)
 
@@ -1474,7 +1474,7 @@ URL: https://{ORG_ALIAS}.awsapps.com/mail
 Login: ai@yourdomain.com + password
 ```
 
-**💡 Tip:** Log into the Web UI to verify everything works before configuring Clawdbot.
+**💡 Tip:** Log into the Web UI to verify everything works before configuring OpenClaw.
 
 - [ ] **CHECKPOINT:** Can log into WorkMail Web UI
 - [ ] **CHECKPOINT:** Connection details saved securely
@@ -1489,7 +1489,7 @@ Login: ai@yourdomain.com + password
 
 ```bash
 # On EC2:
-ssh clawdbot
+ssh openclaw
 
 # Install via cargo (if Rust installed)
 cargo install himalaya
@@ -1535,7 +1535,7 @@ himalaya --output json list
 himalaya --output json read 1
 
 # Send an email
-himalaya send --to someone@example.com --subject "Test" --body "Hello from Clawdbot!"
+himalaya send --to someone@example.com --subject "Test" --body "Hello from OpenClaw!"
 
 # Reply to an email
 himalaya reply 1 --body "Thanks for your email!"
@@ -1552,7 +1552,7 @@ himalaya reply 1 --body "Thanks for your email!"
 │                 (Same mailbox)                           │
 ├────────────────────────┬────────────────────────────────┤
 │                        │                                 │
-│  YOU (Human)           │  CLAWDBOT (AI)                 │
+│  YOU (Human)           │  OPENCLAW (AI)                 │
 │  WorkMail Web UI       │  Himalaya CLI                  │
 │  (browser login)       │  (IMAP connection)             │
 │                        │                                 │
@@ -1564,9 +1564,9 @@ himalaya reply 1 --body "Thanks for your email!"
 └────────────────────────┴────────────────────────────────┘
 ```
 
-**Full visibility** — You can log into the WorkMail web UI anytime to see every email Clawdbot sends/receives.
+**Full visibility** — You can log into the WorkMail web UI anytime to see every email OpenClaw sends/receives.
 
-### Step 3.3: Create GitHub Account for Clawdbot
+### Step 3.3: Create GitHub Account for OpenClaw
 
 1. **Go to** [github.com/signup](https://github.com/signup)
 2. **Use the email** you created (e.g., `ai@yourdomain.com`)
@@ -1588,25 +1588,25 @@ himalaya reply 1 --body "Thanks for your email!"
 
 - [ ] **CHECKPOINT:** GitHub PAT generated
 
-### Step 3.5: Configure Clawdbot with GitHub Access
+### Step 3.5: Configure OpenClaw with GitHub Access
 
 SSH into your EC2:
 
 ```bash
-ssh clawdbot
+ssh openclaw
 ```
 
 **Add GitHub credentials to systemd service:**
 
 ```bash
 # Create/update the systemd drop-in file
-cat >> ~/.config/systemd/user/clawdbot-gateway.service.d/aws.conf << 'EOF'
+cat >> ~/.config/systemd/user/openclaw-gateway.service.d/aws.conf << 'EOF'
 Environment="GITHUB_TOKEN=ghp_YOUR_TOKEN_HERE"
 EOF
 
 # Reload and restart
 systemctl --user daemon-reload
-systemctl --user restart clawdbot-gateway
+systemctl --user restart openclaw-gateway
 ```
 
 **Configure git identity on EC2:**
@@ -1616,25 +1616,25 @@ git config --global user.name "Your AI Assistant"
 git config --global user.email "ai@yourdomain.com"
 ```
 
-- [ ] **CHECKPOINT:** Clawdbot has GitHub access
+- [ ] **CHECKPOINT:** OpenClaw has GitHub access
 
-### Step 3.6: Add Clawdbot as Collaborator to Repos
+### Step 3.6: Add OpenClaw as Collaborator to Repos
 
-For each repo you want Clawdbot to manage:
+For each repo you want OpenClaw to manage:
 
 1. Go to repo → Settings → Collaborators
-2. Add the Clawdbot GitHub username
+2. Add the OpenClaw GitHub username
 3. Grant **Write** or **Admin** access as needed
 
-Now Clawdbot can:
+Now OpenClaw can:
 - ✅ Clone private repos
 - ✅ Push commits
 - ✅ Create branches and PRs
 - ✅ Receive notifications via email
 
-- [ ] **CHECKPOINT:** Clawdbot added as collaborator
+- [ ] **CHECKPOINT:** OpenClaw added as collaborator
 
-### Step 3.7: Create X/Twitter Account for Clawdbot
+### Step 3.7: Create X/Twitter Account for OpenClaw
 
 **X API Pricing (as of 2024):**
 
@@ -1646,10 +1646,10 @@ Now Clawdbot can:
 
 **Recommended approach: Browser Automation (Free)**
 
-Instead of paying $100/month for API access, Clawdbot can use browser automation to post:
+Instead of paying $100/month for API access, OpenClaw can use browser automation to post:
 
 ```
-Clawdbot has browser tools
+OpenClaw has browser tools
         │
         ▼
 Login to X (one-time, save session)
@@ -1669,9 +1669,9 @@ Type and post
    - Username suggestion: `yourdomain_ai` or `yourname_ai`
    - Verify email
 
-2. **Login via Clawdbot's browser:**
+2. **Login via OpenClaw's browser:**
    ```bash
-   # Clawdbot can open browser, login, and save session
+   # OpenClaw can open browser, login, and save session
    # Then post via browser automation
    ```
 
@@ -1679,7 +1679,7 @@ Type and post
    ```
    You: "Post to X: Just shipped a new feature! 🚀"
    
-   Clawdbot:
+   OpenClaw:
    1. Opens X in browser (using saved session)
    2. Navigates to compose
    3. Types the tweet
@@ -1692,14 +1692,14 @@ Type and post
 - [ ] **CHECKPOINT:** X account created
 - [ ] **CHECKPOINT:** Can post via browser automation
 
-### Clawdbot Digital Identity Summary
+### OpenClaw Digital Identity Summary
 
 | Service | Handle | Purpose | Status |
 |---------|--------|---------|--------|
 | Email | ai@yourdomain.com | Foundation for all services | 🔜 |
 | GitHub | @yourdomain-ai | Code, repos, commits | 🔜 |
 | X/Twitter | @yourdomain_ai | Social posts | 🔜 |
-| Website | yourdomain.com | Public presence (you build, Clawdbot maintains) | 🔜 |
+| Website | yourdomain.com | Public presence (you build, OpenClaw maintains) | 🔜 |
 
 ---
 
@@ -1707,7 +1707,7 @@ Type and post
 
 > ⚠️ **Do NOT host your public website on this EC2!**
 >
-> For security, keep this Clawdbot server private. Host your public website on a separate platform.
+> For security, keep this OpenClaw server private. Host your public website on a separate platform.
 
 ### Recommended Hosting Options
 
@@ -1718,23 +1718,23 @@ Type and post
 | **Cloudflare Pages** | Static + Workers | Free tier |
 | **S3 + CloudFront** | AWS-native static | ~$1/month |
 
-### How Clawdbot Updates Your Website
+### How OpenClaw Updates Your Website
 
 ```
 ┌─────────────────────┐         ┌─────────────────────┐
-│  Clawdbot (EC2)     │         │  Vercel/Netlify     │
+│  OpenClaw (EC2)     │         │  Vercel/Netlify     │
 │                     │         │                     │
 │  1. You instruct    │         │  3. Auto-deploys    │
-│     Clawdbot        │ ──git──▶│     from main       │
+│     OpenClaw        │ ──git──▶│     from main       │
 │                     │  push   │                     │
-│  2. Clawdbot edits  │         │  4. Site updated!   │
+│  2. OpenClaw edits  │         │  4. Site updated!   │
 │     files & commits │         │                     │
 └─────────────────────┘         └─────────────────────┘
 ```
 
 ### Step 4.1: Create Website Repo
 
-On GitHub (using Clawdbot's account or yours):
+On GitHub (using OpenClaw's account or yours):
 
 ```bash
 # Create a new repo for your website
@@ -1792,7 +1792,7 @@ export default async function handler(req, res) {
 ```
 
 **This public chatbot:**
-- ❌ Does NOT connect to your private Clawdbot
+- ❌ Does NOT connect to your private OpenClaw
 - ✅ Uses direct Anthropic/Bedrock API calls
 - ✅ Is stateless (no memory, no tools)
 - ✅ Safe for public exposure
@@ -1804,7 +1804,7 @@ export default async function handler(req, res) {
 ## Phase 5: Crabwalk Integration
 
 ### What is Crabwalk?
-Open-source companion monitor for ClawdBot (https://github.com/luccast/crabwalk)
+Open-source companion monitor for OpenClaw (https://github.com/luccast/crabwalk)
 
 Features:
 - Live node graph of sessions & action chains
@@ -1814,7 +1814,7 @@ Features:
 
 ### Planned Steps:
 - [ ] Clone crabwalk repo
-- [ ] Configure to connect to ClawdBot gateway
+- [ ] Configure to connect to OpenClaw gateway
 - [ ] Run as a monitoring dashboard
 
 ---
@@ -1839,7 +1839,7 @@ Features:
    ```
    If empty or missing port 22, re-add the SSH rule
 4. **Your IP may have changed** - Update the SSH security group rule
-5. **Check PEM key permissions**: `ls -la ~/.ssh/clawdbot-key.pem` should show `-r--------`
+5. **Check PEM key permissions**: `ls -la ~/.ssh/openclaw-key.pem` should show `-r--------`
 
 ### "Permission denied (publickey)" when SSH
 
@@ -1848,7 +1848,7 @@ Features:
 **Solution:**
 ```bash
 # Delete and recreate the key
-rm ~/.ssh/clawdbot-key.pem
+rm ~/.ssh/openclaw-key.pem
 # Use cat method to create it (see Step 1.5 Option B)
 ```
 
@@ -1881,25 +1881,25 @@ npm cache clean --force
 rm -rf ~/.npm/_cacache
 ```
 
-### ClawdBot gateway not starting
+### OpenClaw gateway not starting
 
 ```bash
 # Check service status
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 
 # View logs
-journalctl --user -u clawdbot-gateway -f
+journalctl --user -u openclaw-gateway -f
 
 # Try manual start for debugging
-clawdbot gateway --port 18789 --verbose
+openclaw gateway --port 18789 --verbose
 ```
 
 ### Port 18789 accessible from outside (SECURITY ISSUE!)
 
 **IMMEDIATELY run on EC2:**
 ```bash
-clawdbot configure --section gateway --set bind=loopback
-systemctl --user restart clawdbot-gateway
+openclaw configure --section gateway --set bind=loopback
+systemctl --user restart openclaw-gateway
 ```
 
 **Verify it's fixed:**
@@ -1922,7 +1922,7 @@ aws ec2 describe-instances --instance-ids $INSTANCE_ID \
 ### AWS Bedrock "Missing auth" or "Unknown model" errors
 
 **Symptoms:**
-- `clawdbot models` shows "Missing auth" for amazon-bedrock
+- `openclaw models` shows "Missing auth" for amazon-bedrock
 - Error: `Unknown model: amazon-bedrock/...`
 - Gateway crashes on startup with config validation errors
 
@@ -1930,19 +1930,19 @@ aws ec2 describe-instances --instance-ids $INSTANCE_ID \
 
 1. **Systemd service doesn't see AWS credentials**
    
-   The Clawdbot gateway runs as a systemd service, which is isolated from your shell environment. Even if `aws sts get-caller-identity` works in SSH, the service won't see those credentials.
+   The OpenClaw gateway runs as a systemd service, which is isolated from your shell environment. Even if `aws sts get-caller-identity` works in SSH, the service won't see those credentials.
    
    **Fix:** Create a systemd drop-in file (see Step 1.11.3 Option B):
    ```bash
-   mkdir -p ~/.config/systemd/user/clawdbot-gateway.service.d
-   cat > ~/.config/systemd/user/clawdbot-gateway.service.d/aws.conf << 'EOF'
+   mkdir -p ~/.config/systemd/user/openclaw-gateway.service.d
+   cat > ~/.config/systemd/user/openclaw-gateway.service.d/aws.conf << 'EOF'
    [Service]
    Environment="AWS_ACCESS_KEY_ID=YOUR_KEY"
    Environment="AWS_SECRET_ACCESS_KEY=YOUR_SECRET"
    Environment="AWS_REGION=us-east-1"
    EOF
    systemctl --user daemon-reload
-   systemctl --user restart clawdbot-gateway
+   systemctl --user restart openclaw-gateway
    ```
 
 2. **Using raw model ID instead of cross-region inference profile**
@@ -1954,7 +1954,7 @@ aws ec2 describe-instances --instance-ids $INSTANCE_ID \
 
 3. **Invalid auth profile format in config**
    
-   Clawdbot does NOT support embedded AWS credentials in `clawdbot.json`. This format is INVALID:
+   OpenClaw does NOT support embedded AWS credentials in `openclaw.json`. This format is INVALID:
    ```json
    "amazon-bedrock:default": {
      "provider": "amazon-bedrock",
@@ -1985,8 +1985,8 @@ response = client.invoke_model(
 print('SUCCESS!' if response else 'FAILED')
 "
 
-# Check Clawdbot sees the credentials
-clawdbot models
+# Check OpenClaw sees the credentials
+openclaw models
 # Should NOT show "Missing auth" for amazon-bedrock
 ```
 
@@ -2008,31 +2008,31 @@ aws ec2 describe-security-groups --group-ids $SG_ID \
 aws ec2 reboot-instances --instance-ids $INSTANCE_ID
 ```
 
-### ClawdBot (on EC2)
+### OpenClaw (on EC2)
 ```bash
-clawdbot status              # Check overall status
-clawdbot health              # Health check
-clawdbot gateway status      # Gateway status
-clawdbot security audit --deep  # Security audit
-clawdbot configure --section gateway  # View gateway config
+openclaw status              # Check overall status
+openclaw health              # Health check
+openclaw gateway status      # Gateway status
+openclaw security audit --deep  # Security audit
+openclaw configure --section gateway  # View gateway config
 
 # Service management
-systemctl --user start clawdbot-gateway
-systemctl --user stop clawdbot-gateway
-systemctl --user restart clawdbot-gateway
-systemctl --user status clawdbot-gateway
+systemctl --user start openclaw-gateway
+systemctl --user stop openclaw-gateway
+systemctl --user restart openclaw-gateway
+systemctl --user status openclaw-gateway
 ```
 
 ### SSH Tunnel (from local machine)
 ```bash
 # Simple tunnel
-ssh -i ~/.ssh/clawdbot-key.pem -L 18789:127.0.0.1:18789 -N ec2-user@<ELASTIC_IP>
+ssh -i ~/.ssh/openclaw-key.pem -L 18789:127.0.0.1:18789 -N ec2-user@<ELASTIC_IP>
 
 # Or if you set up ~/.ssh/config:
-ssh clawdbot
+ssh openclaw
 ```
 
-### Access ClawdBot Dashboard (after tunnel)
+### Access OpenClaw Dashboard (after tunnel)
 ```
 http://localhost:18789/?token=YOUR_TOKEN
 ```
@@ -2042,10 +2042,10 @@ http://localhost:18789/?token=YOUR_TOKEN
 ## Notes & Reminders
 
 - ❌ **Never** expose port 18789 to the public internet
-- ✅ **Always** use SSH tunnel to access ClawdBot
+- ✅ **Always** use SSH tunnel to access OpenClaw
 - 🔄 Update your IP in security group if it changes
-- 💾 Back up `~/.clawdbot/` directory regularly
-- 🔄 Keep Node.js and ClawdBot updated
+- 💾 Back up `~/.openclaw/` directory regularly
+- 🔄 Keep Node.js and OpenClaw updated
 - 💰 Elastic IP is free when attached to running instance
 
 ---
@@ -2062,7 +2062,7 @@ http://localhost:18789/?token=YOUR_TOKEN
 | 1.5 Save PEM key locally | ✅ Done | 2026-01-27 |
 | 1.6 SSH into instance | ✅ Done | 2026-01-27 |
 | 1.7 Install Node.js 22+ | ✅ Done | 2026-01-27 |
-| 1.8 Install ClawdBot | ✅ Done | 2026-01-27 |
+| 1.8 Install OpenClaw | ✅ Done | 2026-01-27 |
 | 1.9 Run onboarding | ✅ Done | 2026-01-27 |
 | 1.10 Start gateway | ✅ Done | 2026-01-27 |
 | 1.11 Configure AWS Bedrock | ✅ Done | 2026-01-28 |
@@ -2088,7 +2088,7 @@ http://localhost:18789/?token=YOUR_TOKEN
 - Port 18789: NOT accessible from internet ✅
 - Port 22: Open (SSH access) ✅
 - Gateway bound to localhost only ✅
-- SSH config: `ssh clawdbot` auto-tunnels ✅
+- SSH config: `ssh openclaw` auto-tunnels ✅
 
 ### Phase 2.7: Advanced Security Hardening (Daniel Miessler Checklist) ✅ CORE COMPLETE
 | # | Vulnerability | Fix | Status |
@@ -2104,7 +2104,7 @@ http://localhost:18789/?token=YOUR_TOKEN
 | 9 | No audit logging enabled | Enable session logging | ⏭️ Optional |
 | 10 | Weak/default pairing codes | Cryptographic random token | ✅ Done (48-char hex) |
 
-**Reference:** [Daniel Miessler's CLAWDBOT Security Hardening](https://x.com/DanielMiessler/status/2015865548714975475)
+**Reference:** [Daniel Miessler's OpenClaw Security Hardening](https://x.com/DanielMiessler/status/2015865548714975475)
 
 ---
 
